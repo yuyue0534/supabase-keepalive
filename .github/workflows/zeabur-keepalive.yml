@@ -1,0 +1,34 @@
+name: Zeabur Keep Alive (Hourly)
+
+on:
+  schedule:
+    # 每小时执行一次
+    - cron: "0 * * * *"
+  workflow_dispatch:
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send POST request with timestamp
+        run: |
+          echo "Starting keep-alive request..."
+
+          TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+
+          RESPONSE=$(curl -s -o response.txt -w "%{http_code}" \
+            -X POST https://go-blog-memory.zeabur.app/posts \
+            -H "Content-Type: application/json" \
+            -d "{\"title\":\"Auto KeepAlive $TIMESTAMP\",\"content\":\"Ping from GitHub Actions at $TIMESTAMP\"}")
+
+          echo "HTTP Status Code: $RESPONSE"
+          echo "Response Body:"
+          cat response.txt
+
+          if [ "$RESPONSE" -ne 200 ] && [ "$RESPONSE" -ne 201 ]; then
+            echo "Request failed!"
+            exit 1
+          fi
+
+          echo "Keep-alive successful at $TIMESTAMP"
