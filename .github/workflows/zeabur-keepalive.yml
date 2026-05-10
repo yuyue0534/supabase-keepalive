@@ -3,7 +3,7 @@ name: Zeabur Keep Alive (Hourly)
 on:
   schedule:
     # 每小时执行一次
-    - cron: "0 * * * *"
+    - cron: "0 */3 * * *"
   workflow_dispatch:
 
 jobs:
